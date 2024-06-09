@@ -1,0 +1,14 @@
+public async Task<ActionResult> SubmitForm(InventoryViewModel obj)
+{
+
+    int bloodgrpId = obj.BloodGroupId;
+        int requirement = obj.Requirement;
+    HttpResponseMessage responseMessage = await httpClient.GetAsync($"BloodInventory/{bloodgrpId.ToString()}&&{requirement.ToString()}");
+    if (responseMessage.IsSuccessStatusCode)
+    {
+        var data = await responseMessage.Content.ReadAsStringAsync();
+       // result = JsonConvert.DeserializeObject<string>(data);
+        return View((object)data);
+    }
+    
+    return View();

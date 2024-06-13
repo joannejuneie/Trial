@@ -1,3 +1,88 @@
+@{
+    ViewData["Title"] = "Blood Transfer";
+}
+
+<h2>Blood Transfer</h2>
+
+<div>
+    <form id="transferForm">
+        <div>
+            <label for="hospitalName">Hospital Name:</label>
+            <input type="text" id="hospitalName" name="hospitalName" required />
+        </div>
+        <div>
+            <label for="bottlesRequired">Number of Bottles Required:</label>
+            <input type="number" id="bottlesRequired" name="bottlesRequired" required />
+        </div>
+        <div>
+            <label for="bloodGroup">Blood Group:</label>
+            <input type="text" id="bloodGroup" name="bloodGroup" required />
+        </div>
+        <div>
+            <button type="button" id="checkAvailability">Check Availability</button>
+            <button type="button" id="transfer" disabled>Transfer</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#checkAvailability').on('click', function () {
+                var bloodGroup = $('#bloodGroup').val();
+                var bottlesRequired = $('#bottlesRequired').val();
+
+                // Assuming you have a way to get bloodId from bloodGroup
+                var bloodId = getBloodIdFromGroup(bloodGroup);
+
+                $.ajax({
+                    url: '/BloodTransfer/GetIfRequiredBottlesExist',
+                    type: 'GET',
+                    data: { bloodId: bloodId, requirement: bottlesRequired },
+                    success: function (response) {
+                        alert(response);
+                        $('#transfer').prop('disabled', false);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                        $('#transfer').prop('disabled', true);
+                    }
+                });
+            });
+
+            $('#transfer').on('click', function () {
+                var hospitalName = $('#hospitalName').val();
+                var bottlesRequired = $('#bottlesRequired').val();
+                var bloodGroup = $('#bloodGroup').val();
+
+                $.ajax({
+                    url: '/BloodTransfer/Transfer',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ bloodGroup: bloodGroup, requirement: bottlesRequired, hospitalName: hospitalName }),
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+
+            function getBloodIdFromGroup(bloodGroup) {
+                // Implement this function to return the bloodId based on the bloodGroup
+                // This could involve another AJAX call to fetch the bloodId from the server
+                return 1; // Placeholder value
+            }
+        });
+    </script>
+}
+
+
+
+
+
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Net.Http.Json;
